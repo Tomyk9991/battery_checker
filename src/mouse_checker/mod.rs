@@ -60,6 +60,7 @@ impl Rival650 {
                         device.interface_number() == rival_config.endpoint
                 })
                 .collect::<Vec<&DeviceInfo>>();
+            
 
             let device_info = rival_hids
                 .first()

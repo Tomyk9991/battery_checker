@@ -8,4 +8,5 @@ edition = "2021"
 [dependencies]
 hidapi = "2.1.1"
 clap = { version = "4.1.1", features = ["derive"] }
-indicatif = "0.17.3"
+progressing = "3.0.2"
+termsize = "0.1"

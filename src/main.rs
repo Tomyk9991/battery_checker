@@ -1,6 +1,7 @@
+use std::fmt::Debug;
 use crate::mouse_checker::{Rival650, RivalError};
 use clap::Parser;
-use indicatif::{ProgressBar, ProgressStyle};
+use progressing::{Baring, mapping::Bar as MappingBar};
 
 pub mod mouse_checker;
 
@@ -12,6 +13,13 @@ struct Cli {
     show_battery: bool,
 }
 
+
+fn get_width() -> u16 {
+    termsize::get().map(|size| {
+        size.cols
+    }).unwrap()
+}
+
 fn main() -> Result<(), RivalError> {
     let args = Cli::parse();
 
@@ -20,22 +28,18 @@ fn main() -> Result<(), RivalError> {
 
     if args.show_battery {
         let level = rival_650.battery_level();
-        let bar = ProgressBar::new(100);
+
         let unicode = match rival_650.get_is_wired() {
             true => { "🔌" }
             false => { "🪫" }
         };
-        let s = format!("Battery {}% {}:", level, unicode);
 
-        bar.set_style(ProgressStyle::default_bar()
-            .template(&(s + "[{wide_bar:.cyan/blue}]"))
-            .unwrap()
-            .progress_chars("#>-"));
-
-        bar.inc(level as u64);
-        bar.finish();
+        let mut progress_bar = MappingBar::with_range(0, 100);
+        progress_bar.set_len((get_width() - 26) as usize);
+        progress_bar.set(level);
+        let s = format!("Battery {}% {}: {}", level, unicode, progress_bar);
+        println!("{}", s);
     }
-
 
     return Ok(())
 }
